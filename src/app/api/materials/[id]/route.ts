@@ -2,20 +2,22 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Material from '@/models/Material';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
-  const material = await Material.findById(params.id);
+  const { id } = await params;
+  const material = await Material.findById(id);
   if (!material) {
     return NextResponse.json({ error: 'Material not found' }, { status: 404 });
   }
   return NextResponse.json(material);
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
   try {
+    const { id } = await params;
     const body = await request.json();
-    const material = await Material.findByIdAndUpdate(params.id, body, { new: true });
+    const material = await Material.findByIdAndUpdate(id, body, { new: true });
     if (!material) {
       return NextResponse.json({ error: 'Material not found' }, { status: 404 });
     }
@@ -25,9 +27,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
-  const material = await Material.findByIdAndDelete(params.id);
+  const { id } = await params;
+  const material = await Material.findByIdAndDelete(id);
   if (!material) {
     return NextResponse.json({ error: 'Material not found' }, { status: 404 });
   }
