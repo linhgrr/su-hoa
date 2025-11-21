@@ -11,7 +11,7 @@ export default function HomePage() {
     const fetchFlowers = async () => {
       try {
         const res = await axios.get('/api/flowers');
-        setFlowers(res.data);
+        setFlowers(res.data.data || res.data); // Handle both paginated and non-paginated for safety
       } catch (error) {
         console.error('Error fetching flowers:', error);
       } finally {

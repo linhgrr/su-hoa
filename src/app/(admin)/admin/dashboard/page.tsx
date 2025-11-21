@@ -3,12 +3,21 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DollarSign, ShoppingBag, TrendingUp, Users } from 'lucide-react';
 
+interface DashboardStats {
+  revenue: number;
+  orders: number;
+  profit: number;
+  customers: number;
+  recentOrders: any[];
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     revenue: 0,
     orders: 0,
     profit: 0,
-    customers: 0
+    customers: 0,
+    recentOrders: []
   });
 
   useEffect(() => {
@@ -22,6 +31,17 @@ export default function AdminDashboard() {
     };
     fetchStats();
   }, []);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed': return 'bg-blue-100 text-blue-800';
+      case 'delivering': return 'bg-purple-100 text-purple-800';
+      case 'done': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div>
@@ -72,7 +92,26 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-bold mb-4">Recent Orders</h2>
-          <p className="text-gray-500">No recent orders.</p>
+          {stats.recentOrders && stats.recentOrders.length > 0 ? (
+            <div className="space-y-4">
+              {stats.recentOrders.map((order: any) => (
+                <div key={order._id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                  <div>
+                    <p className="font-medium">{order.customer?.name || 'Guest'}</p>
+                    <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold">{order.totalAmount.toLocaleString()} ₫</p>
+                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No recent orders.</p>
+          )}
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-bold mb-4">Low Stock Alert</h2>

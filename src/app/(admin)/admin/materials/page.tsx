@@ -5,9 +5,17 @@ import { Plus } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import toast from 'react-hot-toast';
 
+import Pagination from '@/components/Pagination';
+
 export default function MaterialsPage() {
   const [materials, setMaterials] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
   const [formData, setFormData] = useState({
     name: '',
     unit: '',
@@ -16,13 +24,14 @@ export default function MaterialsPage() {
   });
 
   useEffect(() => {
-    fetchMaterials();
-  }, []);
+    fetchMaterials(pagination.page);
+  }, [pagination.page]);
 
-  const fetchMaterials = async () => {
+  const fetchMaterials = async (page: number) => {
     try {
-      const res = await axios.get('/api/materials');
-      setMaterials(res.data);
+      const res = await axios.get(`/api/materials?page=${page}&limit=${pagination.limit}`);
+      setMaterials(res.data.data);
+      setPagination(prev => ({ ...prev, ...res.data.pagination }));
     } catch (error) {
       console.error(error);
       toast.error('Failed to fetch materials');
@@ -35,7 +44,7 @@ export default function MaterialsPage() {
       await axios.post('/api/materials', formData);
       setShowModal(false);
       setFormData({ name: '', unit: '', description: '', image: '' });
-      fetchMaterials();
+      fetchMaterials(pagination.page);
       toast.success('Material created successfully');
     } catch (error) {
       console.error(error);
@@ -132,6 +141,12 @@ export default function MaterialsPage() {
           </tbody>
         </table>
       </div>
+      
+      <Pagination 
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50">

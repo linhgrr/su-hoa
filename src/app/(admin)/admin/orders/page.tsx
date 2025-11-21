@@ -5,18 +5,27 @@ import { format } from 'date-fns';
 import { Eye, CheckCircle, Truck, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import Pagination from '@/components/Pagination';
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(pagination.page);
+  }, [pagination.page]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page: number) => {
     try {
-      const res = await axios.get('/api/orders');
-      setOrders(res.data);
+      const res = await axios.get(`/api/orders?page=${page}&limit=${pagination.limit}`);
+      setOrders(res.data.data);
+      setPagination(prev => ({ ...prev, ...res.data.pagination }));
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to fetch orders');
@@ -29,7 +38,7 @@ export default function OrdersPage() {
     if (!confirm(`Are you sure you want to update status to ${status}?`)) return;
     try {
       await axios.put(`/api/orders/${id}/status`, { status });
-      fetchOrders();
+      fetchOrders(pagination.page);
       toast.success(`Order status updated to ${status}`);
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || 'Failed to update status';
@@ -111,6 +120,12 @@ export default function OrdersPage() {
           </tbody>
         </table>
       </div>
+      
+      <Pagination 
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+      />
     </div>
   );
 }

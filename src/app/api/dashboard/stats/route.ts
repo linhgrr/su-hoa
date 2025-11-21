@@ -68,14 +68,22 @@ export async function GET() {
     // 4. Net Profit
     const netProfit = totalRevenue - materialCost - fixedExpenses - wasteCost;
 
+    // 5. Recent Orders
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('items.flower', 'name images')
+      .populate('customer.user', 'name email');
+
     return NextResponse.json({
       revenue: totalRevenue,
-      orders: totalOrders, // Showing total orders (including pending), or just completed? Dashboard usually shows total volume.
+      orders: totalOrders,
       completedOrders,
       profit: netProfit,
       customers: totalCustomers,
       expenses: fixedExpenses,
-      materialCost
+      materialCost,
+      recentOrders
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

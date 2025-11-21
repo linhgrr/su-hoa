@@ -9,8 +9,29 @@ import '@/models/User'; // Register User model
 
 export async function GET(request: Request) {
   await dbConnect();
-  const orders = await Order.find().sort({ createdAt: -1 }).populate('items.flower');
-  return NextResponse.json(orders);
+  
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const skip = (page - 1) * limit;
+
+  const orders = await Order.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate('items.flower');
+    
+  const total = await Order.countDocuments();
+
+  return NextResponse.json({
+    data: orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  });
 }
 
 export async function POST(request: Request) {

@@ -5,11 +5,19 @@ import { Plus, Trash2 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import toast from 'react-hot-toast';
 
+import Pagination from '@/components/Pagination';
+
 export default function FlowersPage() {
   const [flowers, setFlowers] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 9, // 3 columns x 3 rows
+    total: 0,
+    totalPages: 0
+  });
   
   // Form State
   const [formData, setFormData] = useState({
@@ -21,16 +29,17 @@ export default function FlowersPage() {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(pagination.page);
+  }, [pagination.page]);
 
-  const fetchData = async () => {
+  const fetchData = async (page: number) => {
     try {
       const [flowersRes, materialsRes] = await Promise.all([
-        axios.get('/api/flowers'),
+        axios.get(`/api/flowers?page=${page}&limit=${pagination.limit}`),
         axios.get('/api/materials')
       ]);
-      setFlowers(flowersRes.data);
+      setFlowers(flowersRes.data.data);
+      setPagination(prev => ({ ...prev, ...flowersRes.data.pagination }));
       setMaterials(materialsRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -64,7 +73,7 @@ export default function FlowersPage() {
       await axios.post('/api/flowers', formData);
       setShowModal(false);
       setFormData({ name: '', description: '', salePrice: 0, mainImage: '', recipe: [] });
-      fetchData();
+      fetchData(pagination.page);
       toast.success('Flower created successfully');
     } catch (error) {
       console.error('Error creating flower:', error);
@@ -107,9 +116,9 @@ export default function FlowersPage() {
                 <button 
                   onClick={async () => {
                     if (confirm('Delete this flower?')) {
-                      try {
+                        try {
                         await axios.delete(`/api/flowers/${flower._id}`);
-                        fetchData();
+                        fetchData(pagination.page);
                         toast.success('Flower deleted successfully');
                       } catch (error) {
                         toast.error('Failed to delete flower');
@@ -125,6 +134,12 @@ export default function FlowersPage() {
           </div>
         ))}
       </div>
+      
+      <Pagination 
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-4 z-50">

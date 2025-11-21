@@ -5,9 +5,17 @@ import { Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
+import Pagination from '@/components/Pagination';
+
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
   const [formData, setFormData] = useState({
     name: '',
     amount: 0,
@@ -16,13 +24,14 @@ export default function ExpensesPage() {
   });
 
   useEffect(() => {
-    fetchExpenses();
-  }, []);
+    fetchExpenses(pagination.page);
+  }, [pagination.page]);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = async (page: number) => {
     try {
-      const res = await axios.get('/api/expenses');
-      setExpenses(res.data);
+      const res = await axios.get(`/api/expenses?page=${page}&limit=${pagination.limit}`);
+      setExpenses(res.data.data);
+      setPagination(prev => ({ ...prev, ...res.data.pagination }));
     } catch (error) {
       console.error(error);
       toast.error('Failed to fetch expenses');
@@ -34,7 +43,7 @@ export default function ExpensesPage() {
     try {
       await axios.post('/api/expenses', formData);
       setShowModal(false);
-      fetchExpenses();
+      fetchExpenses(pagination.page);
       toast.success('Expense added successfully');
     } catch (error) {
       console.error(error);
@@ -46,7 +55,7 @@ export default function ExpensesPage() {
     if (!confirm('Delete this expense?')) return;
     try {
       await axios.delete(`/api/expenses?id=${id}`);
-      fetchExpenses();
+      fetchExpenses(pagination.page);
       toast.success('Expense deleted successfully');
     } catch (error) {
       toast.error('Failed to delete expense');
