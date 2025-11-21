@@ -10,6 +10,19 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Admin Theme Colors */
+  --color-pastel-pink: #FFE2E5;
+  --color-pastel-pink-dark: #FA5A7D;
+  --color-pastel-green: #DCFCE7;
+  --color-pastel-green-dark: #3CD856;
+  --color-pastel-peach: #FFF4DE;
+  --color-pastel-peach-dark: #FF947A;
+  --color-pastel-purple: #F3E8FF;
+  --color-pastel-purple-dark: #BF83FF;
+  --color-sidebar-active: #D1FBE6;
+  --color-sidebar-text: #4A4A4A;
+  --color-sidebar-text-active: #00B074;
 }
 
 @media (prefers-color-scheme: dark) {

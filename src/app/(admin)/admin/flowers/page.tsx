@@ -83,11 +83,11 @@ export default function FlowersPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Flowers Management</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">Flowers Management</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700"
+          className="bg-pastel-purple hover:bg-purple-100 text-pastel-purple-dark px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-sm"
         >
           <Plus size={20} /> Add Flower
         </button>
@@ -95,24 +95,24 @@ export default function FlowersPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {flowers.map((flower: any) => (
-          <div key={flower._id} className="bg-white rounded-lg shadow overflow-hidden">
+          <div key={flower._id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
             <img 
               src={flower.mainImage || 'https://via.placeholder.com/300'} 
               alt={flower.name}
               className="w-full h-48 object-cover"
             />
-            <div className="p-4">
-              <h3 className="text-xl font-bold mb-2">{flower.name}</h3>
-              <p className="text-gray-600 mb-2 line-clamp-2">{flower.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-bold text-blue-600">
+            <div className="p-5">
+              <h3 className="text-xl font-bold mb-2 text-gray-800">{flower.name}</h3>
+              <p className="text-gray-600 mb-3 line-clamp-2 text-sm">{flower.description}</p>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-lg font-bold text-pastel-purple-dark">
                   {(flower.salePrice || 0).toLocaleString()} ₫
                 </span>
-                <span className="text-sm text-gray-500">
-                  Base Cost: {flower.baseCost?.toLocaleString() || 0} ₫
+                <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                  Cost: {flower.baseCost?.toLocaleString() || 0} ₫
                 </span>
               </div>
-              <div className="mt-4 flex justify-end">
+              <div className="flex justify-end pt-3 border-t border-gray-100">
                 <button 
                   onClick={async () => {
                     if (confirm('Delete this flower?')) {
@@ -125,7 +125,7 @@ export default function FlowersPage() {
                       }
                     }
                   }}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-red-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg"
                 >
                   <Trash2 size={20} />
                 </button>
@@ -143,26 +143,26 @@ export default function FlowersPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-4 z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl my-8">
-            <h2 className="text-xl font-bold mb-4">Add New Flower</h2>
+          <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl my-8 border border-gray-100">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Add New Flower</h2>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                   <input
                     type="text"
                     required
-                    className="mt-1 block w-full border rounded-md shadow-sm p-2"
+                    className="block w-full border border-gray-200 rounded-xl shadow-sm p-3 focus:ring-2 focus:ring-pastel-purple-dark focus:border-transparent"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Sale Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sale Price</label>
                   <input
                     type="number"
                     required
-                    className="mt-1 block w-full border rounded-md shadow-sm p-2"
+                    className="block w-full border border-gray-200 rounded-xl shadow-sm p-3 focus:ring-2 focus:ring-pastel-purple-dark focus:border-transparent"
                     value={formData.salePrice}
                     onChange={(e) => setFormData({ ...formData, salePrice: Number(e.target.value) })}
                   />
@@ -178,9 +178,9 @@ export default function FlowersPage() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <textarea
-                  className="mt-1 block w-full border rounded-md shadow-sm p-2"
+                  className="block w-full border border-gray-200 rounded-xl shadow-sm p-3 focus:ring-2 focus:ring-pastel-purple-dark focus:border-transparent min-h-[80px]"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
@@ -233,13 +233,13 @@ export default function FlowersPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  className="px-6 py-2.5 text-gray-600 hover:text-gray-800 font-medium rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-6 py-2.5 bg-pastel-purple hover:bg-purple-100 text-pastel-purple-dark rounded-xl font-medium transition-colors shadow-sm"
                 >
                   Save Flower
                 </button>

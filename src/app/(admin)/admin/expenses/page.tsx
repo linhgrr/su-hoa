@@ -64,36 +64,38 @@ export default function ExpensesPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Fixed Expenses</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">Fixed Expenses</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700"
+          className="bg-pastel-peach hover:bg-orange-100 text-pastel-peach-dark px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-sm"
         >
           <Plus size={20} /> Add Expense
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <table className="min-w-full">
+          <thead className="bg-gray-50/50">
+            <tr className="border-b border-gray-100">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Frequency</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Start Date</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white">
             {expenses.map((expense: any) => (
-              <tr key={expense._id}>
-                <td className="px-6 py-4">{expense.name}</td>
-                <td className="px-6 py-4 font-bold">{expense.amount.toLocaleString()} ₫</td>
-                <td className="px-6 py-4 capitalize">{expense.frequency}</td>
-                <td className="px-6 py-4">{format(new Date(expense.startDate), 'dd/MM/yyyy')}</td>
+              <tr key={expense._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                <td className="px-6 py-4 font-medium text-gray-800">{expense.name}</td>
+                <td className="px-6 py-4 font-bold text-gray-800">{expense.amount.toLocaleString()} ₫</td>
+                <td className="px-6 py-4 capitalize text-gray-600">
+                  <span className="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium">{expense.frequency}</span>
+                </td>
+                <td className="px-6 py-4 text-gray-600">{format(new Date(expense.startDate), 'dd/MM/yyyy')}</td>
                 <td className="px-6 py-4">
-                  <button onClick={() => handleDelete(expense._id)} className="text-red-600 hover:text-red-800">
+                  <button onClick={() => handleDelete(expense._id)} className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors">
                     <Trash2 size={18} />
                   </button>
                 </td>
@@ -105,14 +107,14 @@ export default function ExpensesPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Add Expense</h2>
+          <div className="bg-white p-8 rounded-3xl shadow-xl w-96 border border-gray-100">
+ <h2 className="text-2xl font-bold mb-6 text-gray-800">Add Expense</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                 <input
                   required
-                  className="w-full border rounded p-2"
+                  className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-pastel-peach-dark focus:border-transparent"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                 />
@@ -150,8 +152,8 @@ export default function ExpensesPage() {
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 text-gray-600 hover:text-gray-800 font-medium rounded-xl hover:bg-gray-100 transition-colors">Cancel</button>
+                <button type="submit" className="px-6 py-2.5 bg-pastel-peach hover:bg-orange-100 text-pastel-peach-dark rounded-xl font-medium transition-colors shadow-sm">Save</button>
               </div>
             </form>
           </div>

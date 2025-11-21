@@ -96,42 +96,42 @@ export default function MaterialsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Materials Management</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">Materials Management</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700"
+          className="bg-pastel-green hover:bg-green-100 text-pastel-green-dark px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-sm"
         >
           <Plus size={20} /> Add Material
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <table className="min-w-full">
+          <thead className="bg-gray-50/50">
+            <tr className="border-b border-gray-100">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white">
             {materials.map((material: any) => (
-              <tr key={material._id}>
-                <td className="px-6 py-4 whitespace-nowrap">{material.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{material.unit}</td>
-                <td className="px-6 py-4">{material.description}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={material._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                <td className="px-6 py-4 font-medium text-gray-800">{material.name}</td>
+                <td className="px-6 py-4 text-gray-600">{material.unit}</td>
+                <td className="px-6 py-4 text-gray-600 text-sm">{material.description}</td>
+                <td className="px-6 py-4 whitespace-nowrap space-x-3">
                   <button 
                     onClick={() => handleImportLot(material)}
-                    className="text-blue-600 hover:text-blue-800 mr-2"
+                    className="text-pastel-purple-dark hover:text-purple-700 font-medium text-sm transition-colors"
                   >
                     Import Lot
                   </button>
                   <button 
                     onClick={() => handleViewLots(material)}
-                    className="text-green-600 hover:text-green-800"
+                    className="text-pastel-green-dark hover:text-green-700 font-medium text-sm transition-colors"
                   >
                     View Lots
                   </button>

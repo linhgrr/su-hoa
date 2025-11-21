@@ -60,10 +60,10 @@ export default function ImageUpload({ onUpload, currentImage }: ImageUploadProps
           <img 
             src={preview} 
             alt="Preview" 
-            className="w-20 h-20 object-cover rounded border"
+            className="w-20 h-20 object-cover rounded-xl border border-gray-100 shadow-sm"
           />
         )}
-        <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded flex items-center gap-2 text-gray-700 transition-colors">
+        <label className="cursor-pointer bg-pastel-purple hover:bg-purple-100 px-4 py-2 rounded-xl flex items-center gap-2 text-pastel-purple-dark font-medium transition-colors shadow-sm">
           {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
           <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
           <input 

@@ -75,6 +75,76 @@ export async function GET() {
       .populate('items.flower', 'name images')
       .populate('customer.user', 'name email');
 
+    // 6. Monthly Revenue (Current Year)
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(`${currentYear}-01-01`);
+    const endOfYear = new Date(`${currentYear}-12-31`);
+
+    const monthlyRevenueAgg = await Order.aggregate([
+      { 
+        $match: { 
+          status: 'done',
+          createdAt: { $gte: startOfYear, $lte: endOfYear }
+        } 
+      },
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          total: { $sum: '$totalAmount' }
+        }
+      }
+    ]);
+
+    const monthlyRevenue = Array(12).fill(0);
+    monthlyRevenueAgg.forEach(item => {
+      monthlyRevenue[item._id - 1] = item.total;
+    });
+
+    // 7. Monthly Expenses (Current Year)
+    const monthlyExpensesAgg = await ExpenseTransaction.aggregate([
+      {
+        $match: {
+          date: { $gte: startOfYear, $lte: endOfYear }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: '$date' },
+          total: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    const monthlyExpenses = Array(12).fill(0);
+    monthlyExpensesAgg.forEach(item => {
+      monthlyExpenses[item._id - 1] = item.total;
+    });
+
+    // 8. Order Status Distribution
+    const orderStatusAgg = await Order.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const orderStatusDistribution = {
+      pending: 0,
+      confirmed: 0,
+      delivering: 0,
+      done: 0,
+      cancelled: 0
+    };
+
+    orderStatusAgg.forEach(item => {
+      if (item._id in orderStatusDistribution) {
+        // @ts-ignore
+        orderStatusDistribution[item._id] = item.count;
+      }
+    });
+
     return NextResponse.json({
       revenue: totalRevenue,
       orders: totalOrders,
@@ -83,7 +153,12 @@ export async function GET() {
       customers: totalCustomers,
       expenses: fixedExpenses,
       materialCost,
-      recentOrders
+      recentOrders,
+      charts: {
+        monthlyRevenue,
+        monthlyExpenses,
+        orderStatusDistribution
+      }
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
