@@ -2,9 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Flower, Package, ShoppingCart, Settings, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Flower, Package, ShoppingCart, Settings, DollarSign, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
-const AdminSidebar = () => {
+interface AdminSidebarProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (isOpen: boolean) => void;
+}
+
+const AdminSidebar = ({ isOpen, setIsOpen, isMobileOpen, setIsMobileOpen }: AdminSidebarProps) => {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
@@ -20,16 +27,34 @@ const AdminSidebar = () => {
     { path: '/admin/settings', label: 'Settings', icon: Settings },
   ];
 
+  const sidebarClasses = `
+    bg-white h-screen fixed left-0 top-0 border-r border-gray-100 flex flex-col transition-all duration-300 z-40
+    ${isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0'}
+    ${isOpen ? 'md:w-64' : 'md:w-20'}
+  `;
+
   return (
-    <div className="w-64 bg-white h-screen p-6 fixed left-0 top-0 border-r border-gray-100 flex flex-col">
-      <div className="flex items-center gap-2 mb-10 px-2">
-        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+    <div className={sidebarClasses}>
+      {/* Header */}
+      <div className={`flex items-center gap-2 mb-10 px-6 pt-6 ${!isOpen && 'md:justify-center md:px-2'}`}>
+        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 shrink-0">
           <Flower size={20} />
         </div>
-        <h1 className="text-xl font-bold text-gray-800">By Bloom</h1>
+        <h1 className={`text-xl font-bold text-gray-800 whitespace-nowrap transition-opacity duration-300 ${!isOpen && 'md:hidden'}`}>
+          By Bloom
+        </h1>
+        
+        {/* Mobile Close Button */}
+        <button 
+          onClick={() => setIsMobileOpen(false)}
+          className="md:hidden ml-auto text-gray-400 hover:text-gray-600"
+        >
+          <X size={20} />
+        </button>
       </div>
       
-      <nav className="space-y-2 flex-1">
+      {/* Navigation */}
+      <nav className="space-y-2 flex-1 px-3">
         {navItems.map((item) => {
           const active = isActive(item.path);
           const Icon = item.icon;
@@ -43,23 +68,36 @@ const AdminSidebar = () => {
                   ? 'bg-sidebar-active text-sidebar-text-active font-medium' 
                   : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                 }
+                ${!isOpen && 'md:justify-center'}
               `}
+              title={!isOpen ? item.label : ''}
             >
-              <Icon size={20} className={active ? 'text-sidebar-text-active' : 'text-gray-400'} />
-              <span>{item.label}</span>
+              <Icon size={20} className={`shrink-0 ${active ? 'text-sidebar-text-active' : 'text-gray-400'}`} />
+              <span className={`whitespace-nowrap transition-opacity duration-300 ${!isOpen && 'md:hidden'}`}>
+                {item.label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-gray-100">
-        <div className="px-3 py-2">
+      {/* Footer / Toggle */}
+      <div className="mt-auto pt-6 border-t border-gray-100 pb-6">
+        {/* Desktop Toggle */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="hidden md:flex w-full items-center justify-center p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+        </button>
+
+        <div className={`px-3 py-2 ${!isOpen && 'md:hidden'}`}>
           <p className="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-2">Account</p>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-            <div>
-              <p className="text-sm font-medium text-gray-700">Admin</p>
-              <p className="text-xs text-gray-500">admin@example.com</p>
+            <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0"></div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-medium text-gray-700 truncate">Admin</p>
+              <p className="text-xs text-gray-500 truncate">admin@example.com</p>
             </div>
           </div>
         </div>

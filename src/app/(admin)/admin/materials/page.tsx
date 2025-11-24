@@ -106,7 +106,8 @@ export default function MaterialsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="min-w-full">
           <thead className="bg-gray-50/50">
             <tr className="border-b border-gray-100">
@@ -141,6 +142,39 @@ export default function MaterialsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {materials.map((material: any) => (
+          <div key={material._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">{material.name}</h3>
+                <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-md mt-1 inline-block">
+                  Unit: {material.unit}
+                </span>
+              </div>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">{material.description}</p>
+            
+            <div className="flex gap-3 pt-3 border-t border-gray-50">
+              <button 
+                onClick={() => handleImportLot(material)}
+                className="flex-1 py-2 bg-purple-50 text-pastel-purple-dark rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors"
+              >
+                Import Lot
+              </button>
+              <button 
+                onClick={() => handleViewLots(material)}
+                className="flex-1 py-2 bg-green-50 text-pastel-green-dark rounded-xl text-sm font-medium hover:bg-green-100 transition-colors"
+              >
+                View Lots
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
       
       <Pagination 
         currentPage={pagination.page}
@@ -150,7 +184,7 @@ export default function MaterialsPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md m-4">
             <h2 className="text-xl font-bold mb-4">Add New Material</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
@@ -210,7 +244,7 @@ export default function MaterialsPage() {
 
       {showLotModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md m-4">
             <h2 className="text-xl font-bold mb-4">Import Lot for {selectedMaterial?.name}</h2>
             <form onSubmit={submitLot}>
               <div className="mb-4">

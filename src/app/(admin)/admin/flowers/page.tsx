@@ -146,7 +146,7 @@ export default function FlowersPage() {
           <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl my-8 border border-gray-100">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Add New Flower</h2>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                   <input

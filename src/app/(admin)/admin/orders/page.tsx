@@ -62,7 +62,8 @@ export default function OrdersPage() {
     <div>
       <h1 className="text-2xl font-bold mb-8 text-gray-800">Orders Management</h1>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="min-w-full">
           <thead className="bg-gray-50/50">
             <tr className="border-b border-gray-100">
@@ -119,6 +120,53 @@ export default function OrdersPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {orders.map((order: any) => (
+          <div key={order._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded">#{order._id.slice(-6)}</span>
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                    {order.status}
+                  </span>
+                </div>
+                <h3 className="font-bold text-gray-800">{order.customer.name}</h3>
+                <p className="text-xs text-gray-500">{order.customer.phone}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-lg text-gray-800">{order.totalAmount.toLocaleString()} ₫</p>
+                <p className="text-xs text-gray-400">{format(new Date(order.createdAt), 'dd/MM/yyyy')}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
+              {order.status === 'pending' && (
+                <button onClick={() => updateStatus(order._id, 'confirmed')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-100 transition-colors">
+                  <CheckCircle size={16} /> Confirm
+                </button>
+              )}
+              {order.status === 'confirmed' && (
+                <button onClick={() => updateStatus(order._id, 'delivering')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-purple-50 text-purple-600 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors">
+                  <Truck size={16} /> Deliver
+                </button>
+              )}
+              {order.status === 'delivering' && (
+                <button onClick={() => updateStatus(order._id, 'done')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-green-50 text-green-600 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors">
+                  <CheckCircle size={16} /> Complete
+                </button>
+              )}
+              {['pending', 'confirmed'].includes(order.status) && (
+                <button onClick={() => updateStatus(order._id, 'cancelled')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">
+                  <XCircle size={16} /> Cancel
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
       
       <Pagination 

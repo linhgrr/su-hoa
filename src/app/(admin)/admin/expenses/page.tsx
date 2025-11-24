@@ -74,7 +74,8 @@ export default function ExpensesPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="min-w-full">
           <thead className="bg-gray-50/50">
             <tr className="border-b border-gray-100">
@@ -105,9 +106,40 @@ export default function ExpensesPage() {
         </table>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {expenses.map((expense: any) => (
+          <div key={expense._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">{expense.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-md capitalize">
+                    {expense.frequency}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {format(new Date(expense.startDate), 'dd/MM/yyyy')}
+                  </span>
+                </div>
+              </div>
+              <p className="font-bold text-lg text-gray-800">{expense.amount.toLocaleString()} ₫</p>
+            </div>
+            
+            <div className="flex justify-end pt-3 border-t border-gray-50">
+              <button 
+                onClick={() => handleDelete(expense._id)} 
+                className="flex items-center gap-2 px-4 py-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl text-sm font-medium transition-colors"
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-3xl shadow-xl w-96 border border-gray-100">
+          <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md m-4 border border-gray-100">
  <h2 className="text-2xl font-bold mb-6 text-gray-800">Add Expense</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
