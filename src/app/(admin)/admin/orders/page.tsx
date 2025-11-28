@@ -4,6 +4,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { Eye, CheckCircle, Truck, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Pagination from '@/components/Pagination';
 
@@ -23,6 +24,7 @@ export default function OrdersPage() {
 
   const fetchOrders = async (page: number) => {
     try {
+      setLoading(true);
       const res = await axios.get(`/api/orders?page=${page}&limit=${pagination.limit}`);
       setOrders(res.data.data);
       setPagination(prev => ({ ...prev, ...res.data.pagination }));
@@ -76,97 +78,137 @@ export default function OrdersPage() {
             </tr>
           </thead>
           <tbody className="bg-white">
-            {orders.map((order: any) => (
-              <tr key={order._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap font-mono text-sm text-gray-600">#{order._id.slice(-6)}</td>
-                <td className="px-6 py-4">
-                  <div className="text-sm font-medium text-gray-800">{order.customer.name}</div>
-                  <div className="text-xs text-gray-500">{order.customer.phone}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">
-                  {order.totalAmount.toLocaleString()} ₫
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                  {order.status === 'pending' && (
-                    <button onClick={() => updateStatus(order._id, 'confirmed')} className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors" title="Confirm">
-                      <CheckCircle size={18} />
-                    </button>
-                  )}
-                  {order.status === 'confirmed' && (
-                    <button onClick={() => updateStatus(order._id, 'delivering')} className="text-purple-500 hover:text-purple-700 p-2 hover:bg-purple-50 rounded-lg transition-colors" title="Deliver">
-                      <Truck size={18} />
-                    </button>
-                  )}
-                  {order.status === 'delivering' && (
-                    <button onClick={() => updateStatus(order._id, 'done')} className="text-green-500 hover:text-green-700 p-2 hover:bg-green-50 rounded-lg transition-colors" title="Complete">
-                      <CheckCircle size={18} />
-                    </button>
-                  )}
-                  {['pending', 'confirmed'].includes(order.status) && (
-                    <button onClick={() => updateStatus(order._id, 'cancelled')} className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Cancel">
-                      <XCircle size={18} />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              Array(5).fill(0).map((_, i) => (
+                <tr key={i} className="border-b border-gray-50 last:border-0">
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-24" /></td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-32 mb-1" />
+                    <Skeleton className="h-3 w-24" />
+                  </td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-6 w-24 rounded-full" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-8 w-24 rounded-lg" /></td>
+                </tr>
+              ))
+            ) : (
+              orders.map((order: any) => (
+                <tr key={order._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap font-mono text-sm text-gray-600">#{order._id.slice(-6)}</td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-800">{order.customer.name}</div>
+                    <div className="text-xs text-gray-500">{order.customer.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">
+                    {order.totalAmount.toLocaleString()} ₫
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-3 py-1 inline-flex text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+                    {order.status === 'pending' && (
+                      <button onClick={() => updateStatus(order._id, 'confirmed')} className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors" title="Confirm">
+                        <CheckCircle size={18} />
+                      </button>
+                    )}
+                    {order.status === 'confirmed' && (
+                      <button onClick={() => updateStatus(order._id, 'delivering')} className="text-purple-500 hover:text-purple-700 p-2 hover:bg-purple-50 rounded-lg transition-colors" title="Deliver">
+                        <Truck size={18} />
+                      </button>
+                    )}
+                    {order.status === 'delivering' && (
+                      <button onClick={() => updateStatus(order._id, 'done')} className="text-green-500 hover:text-green-700 p-2 hover:bg-green-50 rounded-lg transition-colors" title="Complete">
+                        <CheckCircle size={18} />
+                      </button>
+                    )}
+                    {['pending', 'confirmed'].includes(order.status) && (
+                      <button onClick={() => updateStatus(order._id, 'cancelled')} className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Cancel">
+                        <XCircle size={18} />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
-        {orders.map((order: any) => (
-          <div key={order._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded">#{order._id.slice(-6)}</span>
-                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                    {order.status}
-                  </span>
+        {loading ? (
+          Array(3).fill(0).map((_, i) => (
+            <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-20 rounded-full" />
+                  </div>
+                  <Skeleton className="h-5 w-32 mb-1" />
+                  <Skeleton className="h-3 w-24" />
                 </div>
-                <h3 className="font-bold text-gray-800">{order.customer.name}</h3>
-                <p className="text-xs text-gray-500">{order.customer.phone}</p>
+                <div className="text-right">
+                  <Skeleton className="h-6 w-24 mb-1" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-lg text-gray-800">{order.totalAmount.toLocaleString()} ₫</p>
-                <p className="text-xs text-gray-400">{format(new Date(order.createdAt), 'dd/MM/yyyy')}</p>
+              <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
+                <Skeleton className="h-9 w-full rounded-xl" />
               </div>
             </div>
+          ))
+        ) : (
+          orders.map((order: any) => (
+            <div key={order._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded">#{order._id.slice(-6)}</span>
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-gray-800">{order.customer.name}</h3>
+                  <p className="text-xs text-gray-500">{order.customer.phone}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-lg text-gray-800">{order.totalAmount.toLocaleString()} ₫</p>
+                  <p className="text-xs text-gray-400">{format(new Date(order.createdAt), 'dd/MM/yyyy')}</p>
+                </div>
+              </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
-              {order.status === 'pending' && (
-                <button onClick={() => updateStatus(order._id, 'confirmed')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-100 transition-colors">
-                  <CheckCircle size={16} /> Confirm
-                </button>
-              )}
-              {order.status === 'confirmed' && (
-                <button onClick={() => updateStatus(order._id, 'delivering')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-purple-50 text-purple-600 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors">
-                  <Truck size={16} /> Deliver
-                </button>
-              )}
-              {order.status === 'delivering' && (
-                <button onClick={() => updateStatus(order._id, 'done')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-green-50 text-green-600 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors">
-                  <CheckCircle size={16} /> Complete
-                </button>
-              )}
-              {['pending', 'confirmed'].includes(order.status) && (
-                <button onClick={() => updateStatus(order._id, 'cancelled')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">
-                  <XCircle size={16} /> Cancel
-                </button>
-              )}
+              <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
+                {order.status === 'pending' && (
+                  <button onClick={() => updateStatus(order._id, 'confirmed')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-100 transition-colors">
+                    <CheckCircle size={16} /> Confirm
+                  </button>
+                )}
+                {order.status === 'confirmed' && (
+                  <button onClick={() => updateStatus(order._id, 'delivering')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-purple-50 text-purple-600 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors">
+                    <Truck size={16} /> Deliver
+                  </button>
+                )}
+                {order.status === 'delivering' && (
+                  <button onClick={() => updateStatus(order._id, 'done')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-green-50 text-green-600 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors">
+                    <CheckCircle size={16} /> Complete
+                  </button>
+                )}
+                {['pending', 'confirmed'].includes(order.status) && (
+                  <button onClick={() => updateStatus(order._id, 'cancelled')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">
+                    <XCircle size={16} /> Cancel
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       
       <Pagination 

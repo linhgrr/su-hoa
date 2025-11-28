@@ -4,12 +4,14 @@ import axios from 'axios';
 import { Plus } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import toast from 'react-hot-toast';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Pagination from '@/components/Pagination';
 
 export default function MaterialsPage() {
   const [materials, setMaterials] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -29,12 +31,15 @@ export default function MaterialsPage() {
 
   const fetchMaterials = async (page: number) => {
     try {
+      setLoading(true);
       const res = await axios.get(`/api/materials?page=${page}&limit=${pagination.limit}`);
       setMaterials(res.data.data);
       setPagination(prev => ({ ...prev, ...res.data.pagination }));
     } catch (error) {
       console.error(error);
       toast.error('Failed to fetch materials');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,62 +123,91 @@ export default function MaterialsPage() {
             </tr>
           </thead>
           <tbody className="bg-white">
-            {materials.map((material: any) => (
-              <tr key={material._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4 font-medium text-gray-800">{material.name}</td>
-                <td className="px-6 py-4 text-gray-600">{material.unit}</td>
-                <td className="px-6 py-4 text-gray-600 text-sm">{material.description}</td>
-                <td className="px-6 py-4 whitespace-nowrap space-x-3">
-                  <button 
-                    onClick={() => handleImportLot(material)}
-                    className="text-pastel-purple-dark hover:text-purple-700 font-medium text-sm transition-colors"
-                  >
-                    Import Lot
-                  </button>
-                  <button 
-                    onClick={() => handleViewLots(material)}
-                    className="text-pastel-green-dark hover:text-green-700 font-medium text-sm transition-colors"
-                  >
-                    View Lots
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              Array(5).fill(0).map((_, i) => (
+                <tr key={i} className="border-b border-gray-50 last:border-0">
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-64" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-8 w-48 rounded-lg" /></td>
+                </tr>
+              ))
+            ) : (
+              materials.map((material: any) => (
+                <tr key={material._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4 font-medium text-gray-800">{material.name}</td>
+                  <td className="px-6 py-4 text-gray-600">{material.unit}</td>
+                  <td className="px-6 py-4 text-gray-600 text-sm">{material.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap space-x-3">
+                    <button 
+                      onClick={() => handleImportLot(material)}
+                      className="text-pastel-purple-dark hover:text-purple-700 font-medium text-sm transition-colors"
+                    >
+                      Import Lot
+                    </button>
+                    <button 
+                      onClick={() => handleViewLots(material)}
+                      className="text-pastel-green-dark hover:text-green-700 font-medium text-sm transition-colors"
+                    >
+                      View Lots
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
-        {materials.map((material: any) => (
-          <div key={material._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h3 className="font-bold text-gray-800 text-lg">{material.name}</h3>
-                <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-md mt-1 inline-block">
-                  Unit: {material.unit}
-                </span>
+        {loading ? (
+          Array(3).fill(0).map((_, i) => (
+            <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <Skeleton className="h-6 w-32 mb-1" />
+                  <Skeleton className="h-5 w-20 rounded-md" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-full mb-4" />
+              <div className="flex gap-3 pt-3 border-t border-gray-50">
+                <Skeleton className="h-9 w-full rounded-xl" />
+                <Skeleton className="h-9 w-full rounded-xl" />
               </div>
             </div>
-            
-            <p className="text-sm text-gray-600 mb-4 line-clamp-2">{material.description}</p>
-            
-            <div className="flex gap-3 pt-3 border-t border-gray-50">
-              <button 
-                onClick={() => handleImportLot(material)}
-                className="flex-1 py-2 bg-purple-50 text-pastel-purple-dark rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors"
-              >
-                Import Lot
-              </button>
-              <button 
-                onClick={() => handleViewLots(material)}
-                className="flex-1 py-2 bg-green-50 text-pastel-green-dark rounded-xl text-sm font-medium hover:bg-green-100 transition-colors"
-              >
-                View Lots
-              </button>
+          ))
+        ) : (
+          materials.map((material: any) => (
+            <div key={material._id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg">{material.name}</h3>
+                  <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-md mt-1 inline-block">
+                    Unit: {material.unit}
+                  </span>
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{material.description}</p>
+              
+              <div className="flex gap-3 pt-3 border-t border-gray-50">
+                <button 
+                  onClick={() => handleImportLot(material)}
+                  className="flex-1 py-2 bg-purple-50 text-pastel-purple-dark rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors"
+                >
+                  Import Lot
+                </button>
+                <button 
+                  onClick={() => handleViewLots(material)}
+                  className="flex-1 py-2 bg-green-50 text-pastel-green-dark rounded-xl text-sm font-medium hover:bg-green-100 transition-colors"
+                >
+                  View Lots
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       
       <Pagination 

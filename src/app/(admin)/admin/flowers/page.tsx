@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Plus, Trash2 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import toast from 'react-hot-toast';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Pagination from '@/components/Pagination';
 
@@ -34,6 +35,7 @@ export default function FlowersPage() {
 
   const fetchData = async (page: number) => {
     try {
+      setLoading(true);
       const [flowersRes, materialsRes] = await Promise.all([
         axios.get(`/api/flowers?page=${page}&limit=${pagination.limit}`),
         axios.get('/api/materials')
@@ -94,45 +96,65 @@ export default function FlowersPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {flowers.map((flower: any) => (
-          <div key={flower._id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-            <img 
-              src={flower.mainImage || 'https://via.placeholder.com/300'} 
-              alt={flower.name}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-5">
-              <h3 className="text-xl font-bold mb-2 text-gray-800">{flower.name}</h3>
-              <p className="text-gray-600 mb-3 line-clamp-2 text-sm">{flower.description}</p>
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-bold text-pastel-purple-dark">
-                  {(flower.salePrice || 0).toLocaleString()} ₫
-                </span>
-                <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
-                  Cost: {flower.baseCost?.toLocaleString() || 0} ₫
-                </span>
-              </div>
-              <div className="flex justify-end pt-3 border-t border-gray-100">
-                <button 
-                  onClick={async () => {
-                    if (confirm('Delete this flower?')) {
-                        try {
-                        await axios.delete(`/api/flowers/${flower._id}`);
-                        fetchData(pagination.page);
-                        toast.success('Flower deleted successfully');
-                      } catch (error) {
-                        toast.error('Failed to delete flower');
-                      }
-                    }
-                  }}
-                  className="text-red-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg"
-                >
-                  <Trash2 size={20} />
-                </button>
+        {loading ? (
+          Array(6).fill(0).map((_, i) => (
+            <div key={i} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <Skeleton className="w-full h-48" />
+              <div className="p-5">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-2/3 mb-3" />
+                <div className="flex justify-between items-center mb-4">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                </div>
+                <div className="flex justify-end pt-3 border-t border-gray-100">
+                  <Skeleton className="h-9 w-9 rounded-lg" />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          flowers.map((flower: any) => (
+            <div key={flower._id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <img 
+                src={flower.mainImage || 'https://via.placeholder.com/300'} 
+                alt={flower.name}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-5">
+                <h3 className="text-xl font-bold mb-2 text-gray-800">{flower.name}</h3>
+                <p className="text-gray-600 mb-3 line-clamp-2 text-sm">{flower.description}</p>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-bold text-pastel-purple-dark">
+                    {(flower.salePrice || 0).toLocaleString()} ₫
+                  </span>
+                  <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                    Cost: {flower.baseCost?.toLocaleString() || 0} ₫
+                  </span>
+                </div>
+                <div className="flex justify-end pt-3 border-t border-gray-100">
+                  <button 
+                    onClick={async () => {
+                      if (confirm('Delete this flower?')) {
+                          try {
+                          await axios.delete(`/api/flowers/${flower._id}`);
+                          fetchData(pagination.page);
+                          toast.success('Flower deleted successfully');
+                        } catch (error) {
+                          toast.error('Failed to delete flower');
+                        }
+                      }
+                    }}
+                    className="text-red-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
       
       <Pagination 

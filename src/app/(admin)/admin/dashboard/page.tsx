@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DollarSign, ShoppingBag, TrendingUp, Users, ArrowUpRight, MoreHorizontal } from 'lucide-react';
 import { Line, Doughnut } from 'react-chartjs-2';
+import { Skeleton } from '@/components/ui/Skeleton';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -55,14 +56,18 @@ export default function AdminDashboard() {
     customers: 0,
     recentOrders: []
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setIsLoading(true);
         const res = await axios.get('/api/dashboard/stats');
         setStats(res.data);
       } catch (error) {
         console.error('Error fetching stats:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchStats();
@@ -166,58 +171,74 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {/* Earnings - Pink */}
-        <div className="bg-pastel-pink p-6 rounded-3xl flex items-center justify-between relative overflow-hidden">
-          <div className="z-10">
+        <div className="bg-pastel-pink p-6 rounded-3xl flex items-center justify-between relative overflow-hidden h-[120px]">
+          <div className="z-10 w-full">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-white/50 rounded-full text-pastel-pink-dark">
                 <DollarSign size={18} />
               </div>
               <span className="text-gray-700 text-sm font-medium">Total Revenue</span>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.revenue.toLocaleString()} ₫</p>
+            {isLoading ? (
+              <Skeleton className="h-9 w-32 bg-white/40" />
+            ) : (
+              <p className="text-3xl font-bold text-gray-800">{stats.revenue.toLocaleString()} ₫</p>
+            )}
           </div>
           {/* Decorative background shape */}
           <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
         </div>
         
         {/* Total Orders - Green */}
-        <div className="bg-pastel-green p-6 rounded-3xl flex items-center justify-between relative overflow-hidden">
-          <div className="z-10">
+        <div className="bg-pastel-green p-6 rounded-3xl flex items-center justify-between relative overflow-hidden h-[120px]">
+          <div className="z-10 w-full">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-white/50 rounded-full text-pastel-green-dark">
                 <ShoppingBag size={18} />
               </div>
               <span className="text-gray-700 text-sm font-medium">Total Orders</span>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.orders}</p>
+            {isLoading ? (
+              <Skeleton className="h-9 w-16 bg-white/40" />
+            ) : (
+              <p className="text-3xl font-bold text-gray-800">{stats.orders}</p>
+            )}
           </div>
           <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
         </div>
 
         {/* Profit - Cyan/Purple */}
-        <div className="bg-pastel-purple p-6 rounded-3xl flex items-center justify-between relative overflow-hidden">
-          <div className="z-10">
+        <div className="bg-pastel-purple p-6 rounded-3xl flex items-center justify-between relative overflow-hidden h-[120px]">
+          <div className="z-10 w-full">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-white/50 rounded-full text-pastel-purple-dark">
                 <TrendingUp size={18} />
               </div>
               <span className="text-gray-700 text-sm font-medium">Net Profit</span>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.profit.toLocaleString()} ₫</p>
+            {isLoading ? (
+              <Skeleton className="h-9 w-32 bg-white/40" />
+            ) : (
+              <p className="text-3xl font-bold text-gray-800">{stats.profit.toLocaleString()} ₫</p>
+            )}
           </div>
           <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
         </div>
 
         {/* Customers - Peach */}
-        <div className="bg-pastel-peach p-6 rounded-3xl flex items-center justify-between relative overflow-hidden">
-          <div className="z-10">
+        <div className="bg-pastel-peach p-6 rounded-3xl flex items-center justify-between relative overflow-hidden h-[120px]">
+          <div className="z-10 w-full">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-white/50 rounded-full text-pastel-peach-dark">
                 <Users size={18} />
               </div>
               <span className="text-gray-700 text-sm font-medium">Customers</span>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.customers}</p>
+            {isLoading ? (
+              <Skeleton className="h-9 w-16 bg-white/40" />
+            ) : (
+              <p className="text-3xl font-bold text-gray-800">{stats.customers}</p>
+            )}
           </div>
           <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
         </div>
@@ -233,7 +254,11 @@ export default function AdminDashboard() {
             </button>
           </div>
           <div className="h-64">
-            <Line data={revenueData} options={chartOptions} />
+            {isLoading ? (
+              <Skeleton className="w-full h-full rounded-xl" />
+            ) : (
+              <Line data={revenueData} options={chartOptions} />
+            )}
           </div>
         </div>
 
@@ -246,57 +271,75 @@ export default function AdminDashboard() {
             </button>
           </div>
           <div className="h-48 flex justify-center items-center relative">
-             <Doughnut 
-                data={donutData} 
-                options={{ 
-                  cutout: '70%', 
-                  plugins: { legend: { display: false } } 
-                }} 
-              />
-              <div className="absolute text-center">
-                <p className="text-xs text-gray-400">Total</p>
-                <p className="text-xl font-bold text-gray-800">{stats.orders}</p>
-              </div>
+             {isLoading ? (
+               <Skeleton className="w-40 h-40 rounded-full" />
+             ) : (
+               <>
+                <Doughnut 
+                    data={donutData} 
+                    options={{ 
+                      cutout: '70%', 
+                      plugins: { legend: { display: false } } 
+                    }} 
+                  />
+                  <div className="absolute text-center">
+                    <p className="text-xs text-gray-400">Total</p>
+                    <p className="text-xl font-bold text-gray-800">{stats.orders}</p>
+                  </div>
+               </>
+             )}
           </div>
           <div className="mt-6 space-y-3">
-            {statusDist && (
-              <>
-                <div className="flex justify-between items-center">
+            {isLoading ? (
+              Array(5).fill(0).map((_, i) => (
+                <div key={i} className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FFF4DE]"></div>
-                    <span className="text-sm text-gray-600">Pending</span>
+                    <Skeleton className="w-3 h-3 rounded-full" />
+                    <Skeleton className="w-16 h-4" />
                   </div>
-                  <span className="text-sm font-medium">{statusDist.pending}</span>
+                  <Skeleton className="w-8 h-4" />
                 </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#E0F2FE]"></div>
-                    <span className="text-sm text-gray-600">Confirmed</span>
+              ))
+            ) : (
+              statusDist && (
+                <>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#FFF4DE]"></div>
+                      <span className="text-sm text-gray-600">Pending</span>
+                    </div>
+                    <span className="text-sm font-medium">{statusDist.pending}</span>
                   </div>
-                  <span className="text-sm font-medium">{statusDist.confirmed}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-pastel-purple"></div>
-                    <span className="text-sm text-gray-600">Delivering</span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#E0F2FE]"></div>
+                      <span className="text-sm text-gray-600">Confirmed</span>
+                    </div>
+                    <span className="text-sm font-medium">{statusDist.confirmed}</span>
                   </div>
-                  <span className="text-sm font-medium">{statusDist.delivering}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-pastel-green"></div>
-                    <span className="text-sm text-gray-600">Done</span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-pastel-purple"></div>
+                      <span className="text-sm text-gray-600">Delivering</span>
+                    </div>
+                    <span className="text-sm font-medium">{statusDist.delivering}</span>
                   </div>
-                  <span className="text-sm font-medium">{statusDist.done}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-pastel-pink"></div>
-                    <span className="text-sm text-gray-600">Cancelled</span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-pastel-green"></div>
+                      <span className="text-sm text-gray-600">Done</span>
+                    </div>
+                    <span className="text-sm font-medium">{statusDist.done}</span>
                   </div>
-                  <span className="text-sm font-medium">{statusDist.cancelled}</span>
-                </div>
-              </>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-pastel-pink"></div>
+                      <span className="text-sm text-gray-600">Cancelled</span>
+                    </div>
+                    <span className="text-sm font-medium">{statusDist.cancelled}</span>
+                  </div>
+                </>
+              )
             )}
           </div>
         </div>
@@ -320,23 +363,34 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="text-sm">
-              {stats.recentOrders && stats.recentOrders.length > 0 ? (
-                stats.recentOrders.map((order: any) => (
-                  <tr key={order._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 font-medium text-gray-700">{order.customer?.name || 'Guest'}</td>
-                    <td className="py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
-                    <td className="py-4 font-bold text-gray-800">{order.totalAmount.toLocaleString()} ₫</td>
-                    <td className="py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
+              {isLoading ? (
+                Array(5).fill(0).map((_, i) => (
+                  <tr key={i} className="border-b border-gray-50 last:border-0">
+                    <td className="py-4"><Skeleton className="h-5 w-32" /></td>
+                    <td className="py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="py-4"><Skeleton className="h-5 w-20" /></td>
+                    <td className="py-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-gray-500">No recent orders found.</td>
-                </tr>
+                stats.recentOrders && stats.recentOrders.length > 0 ? (
+                  stats.recentOrders.map((order: any) => (
+                    <tr key={order._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                      <td className="py-4 font-medium text-gray-700">{order.customer?.name || 'Guest'}</td>
+                      <td className="py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
+                      <td className="py-4 font-bold text-gray-800">{order.totalAmount.toLocaleString()} ₫</td>
+                      <td className="py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-gray-500">No recent orders found.</td>
+                  </tr>
+                )
               )}
             </tbody>
           </table>
