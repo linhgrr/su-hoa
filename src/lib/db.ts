@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
 
+// Import all models to ensure they are registered
+import '@/models/User';
+import '@/models/Flower';
+import '@/models/Material';
+import '@/models/MaterialLot';
+import '@/models/Order';
+import '@/models/InventoryMovement';
+import '@/models/FixedExpense';
+import '@/models/ExpenseTransaction';
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
